@@ -1,16 +1,23 @@
 import numpy as np
+from typing import Union
 
 
 class QVector:
     """A wrapper class for the beloved numpy array, representing quantum state vectors, which implements some convenience
     functions for quantum computing purposes."""
 
-    def __init__(self, arr: np.ndarray, ket: bool = True) -> None:
+    def __init__(self, arr: Union[np.ndarray, list], ket: bool = True) -> None:
         """
         Creates a QVector instance, which resembles the passed ARR.
         Ensures the state is either in the shape (N, 1) representing a Ket,
         or in the shape (1, N) representing a Bra. Also normalizes the vector.
         """
+
+        if type(arr) == list:
+            # Convert the list to a numpy array
+            arr = np.array([arr])
+
+
         try:
             rows, cols = arr.shape
             if not (rows == 1 or cols == 1):
@@ -28,6 +35,10 @@ class QVector:
 
         self._ket = ket
         self._arr = arr
+
+    @property  # TODO: Perhaps return a copy of array.
+    def arr(self):
+        return self._arr
 
     @property
     def shape(self):
