@@ -1,8 +1,16 @@
 import numpy as np
 from qvector import QVector
+from operator import Operator
 
 
 class State(QVector):
+    """A class that captures the state of a quantum system and provides utility functions."""
+    
+    # Some common states (1-qubit)
+    one 
+    plus = H @ x  # |+>
+    minus = H @ Z @ x
+
     def __init__(self, n: int) -> None:
         """Create an N qubit state, which is represented as a (ket) vector with 2^N entries. The vector is taken to be in the
         standard (computational) basis. By default, the state is initialized to the 0th basis state: |0...›.
@@ -39,6 +47,15 @@ class State(QVector):
             string += State.basis_vector_string(n, i)
             string += " "
         return string
+
+    @staticmethod
+    def probabilities(arr):
+        """Returns an array where the ith entry corresponds to the probability of measuring the state to be the ith basis state."""
+        return np.real(arr.conj() * arr)
+
+    def probabilities(self):
+        """Returns an array where the ith entry corresponds to the probability of measuring my state to be the ith basis state."""
+        State.probabilities(self.arr)
 
     def show(self):
         """Print the state in braket notation in the computational basis."""
