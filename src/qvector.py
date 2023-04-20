@@ -36,8 +36,9 @@ class QVector:
         self._ket = ket
         self._arr = arr
 
-    @property  # TODO: Perhaps return a copy of array.
+    @property  # TODO: Perhaps return a copy of array. -> Probably not good from a performance stand-point.
     def arr(self):
+        """Return the np.ndarray I represent."""
         return self._arr
 
     @property
