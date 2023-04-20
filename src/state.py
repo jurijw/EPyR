@@ -8,8 +8,8 @@ class State(QVector):
         standard (computational) basis. By default, the state is initialized to the 0th basis state: |0...›.
         The state is represented by a (2^N, 1) np.ndarray."""
 
-        state: np.ndarray = 0 * np.ones(2**n, 1)
-        state[0] = 1
+        state: np.ndarray = np.zeros(2**n, 1)
+        state[0,:] = 1
         super.__init__(state)
 
     @staticmethod
