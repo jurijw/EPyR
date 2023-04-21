@@ -17,7 +17,6 @@ class QVector:
             # Convert the list to a numpy array
             arr = np.array([arr])
 
-
         try:
             rows, cols = arr.shape
             if not (rows == 1 or cols == 1):
