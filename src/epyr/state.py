@@ -1,10 +1,13 @@
 import numpy as np
 from qvector import QVector
 
-__all__ = ["plus", "State"]
+__all__ = ["plus", "minus", "right", "left", "State"]
 
 
 plus = 1/np.sqrt(2) * np.array([[1, 1]]).T
+minus = 1/np.sqrt(2) * np.array([[1, -1]]).T
+right = 1/np.sqrt(2) * np.array([[1, 1j]]).T
+left = 1/np.sqrt(2) * np.array([[1, -1j]]).T
 
 
 class State(QVector):
@@ -34,11 +37,13 @@ class State(QVector):
     @staticmethod
     def ket_string(arr: np.ndarray):
         """Returns a representation of the passed array as a sum of basis states in braket notation."""
-        nrows = len(arr)  # TODO: be careful of what happens when a bra is passed.
+        nrows = len(
+            arr)  # TODO: be careful of what happens when a bra is passed.
         n = int(np.log2(nrows))
         string = ""
         for i in range(nrows):
-            ci = arr[i, 0]  # The probability amplitude for the ith basis state.
+            # The probability amplitude for the ith basis state.
+            ci = arr[i, 0]
             if ci == 0:
                 continue
             else:

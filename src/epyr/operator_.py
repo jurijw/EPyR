@@ -27,7 +27,7 @@ class Operator:
 
     @staticmethod
     def Itensor(n):
-        """Returns the matrix (ndarray) corresponding to I^{\otimes n}"""
+        """Returns the matrix (ndarray) corresponding to I^{(tensor) n}"""
         return np.eye(2 ** n)
 
     @staticmethod

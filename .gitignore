@@ -133,3 +133,6 @@ dmypy.json
 
 # Sketchpad - A file I use to prototype ideas
 # scratchpad.ipynb
+
+# VS Code filed
+.vscode
