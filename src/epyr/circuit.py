@@ -51,3 +51,27 @@ class Circuit:
         """Apply the quantum circuit to the given input state."""
         self._U = self.create_circuit_unitary(self.gates)
         return self.U @ state.arr
+    
+def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
+    """
+    Apply the two-qubit gate U to qubits with index q0 and q1 for
+    an N qubit state. Performs this operation in-place, mutating
+    the state vector, to avoid large matrix multiplication.
+    """
+    for i0 in range(2 ** q1):
+        for i1 in range(2 ** (q1 - q0 - 1)):
+            for i2 in range(2 ** ((N - 1) - q1)):
+                l = i0 + 2 ** (q0 + 1) * i1 + 2 ** (q1 + 1) * i2
+                # Create a vector of relevant alpha_js
+                # Below, j(b_q0)(b_q1) represents the index of the
+                # basis state for fixed i0, i1, i2 and with the
+                # bits in position q0 and q1 being b_q0 and b_q1 
+                j00 = l + 2 ** q0 * 0 + 2 ** q1 * 0
+                j01 = l + 2 ** q0 * 0 + 2 ** q1 * 1
+                j10 = l + 2 ** q0 * 1 + 2 ** q1 * 0
+                j11 = l + 2 ** q0 * 1 + 2 ** q1 * 1
+
+                j = np.array([j00, j01, j10, j11])
+                # Update all alpha_js by applying the U gate
+                state[j] = U @ state[j]
+                # Replace the alpha_js in the state vector
