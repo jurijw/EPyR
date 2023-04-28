@@ -1,0 +1,2 @@
+class EpyrException(Exception):
+    pass
