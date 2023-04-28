@@ -48,25 +48,34 @@ class Circuit:
             U = gates[i] @ U  # TODO: consider, if numpy has a built-in to do this.
         return U
 
-    def add(self, gate, indices):
+    def add(self, gate, indices=None):
         """Add a gate, sequentially to my circuit's gates. The gate passed must be one of the common gates
-        defined in the operators module, passed as a string, or an (n x n) unitary. Indices can be a single index or a list of
+        defined in the operators module, passed as a string, or an (m x m) unitary. Indices can be a single index or a list of
         indices, which the gate should be applied to."""
         # TODO: check unitarity.
         if type(gate) == str:
             if gate not in operator_dict.keys():
                 raise EpyrException("The requested gate is not available.")
+        # By default, apply the gate to the first log2(m) qubits.  
+        if indices is None:
+            num_affected_qubits = np.log2(len(gate))
+            indices = [i for i in range(num_affected_qubits)]
         # TODO: check unitarIty and that it functions with the indices
         self._gates.append((gate, indices))
 
     def compute(self, state):
         """Apply the quantum circuit to the given input state."""
-        self._U = self.create_circuit_unitary(self.gates)
-        return self.U @ state.arr
-    
-    def efficient_compute(self, state):
-        """Apply the quantum circuit to the given input state."""
-        raise NotImplemented
+        for gate, indices in self._gates:
+            # Check how many qubits are affected by the gate
+            num_affected_qubits = np.log2(len(gate))
+            if num_affected_qubits == 1:
+                target = indices[0]
+                apply_general_one_qubit_gate_in_place(state, gate, target, self.N)
+            elif num_affected_qubits == 2:
+                target0, target1 = indices
+                apply_general_two_qubit_gate_in_place(state, gate, target0, target1, self.N)
+            else:
+                raise NotImplemented
     
 def apply_general_one_qubit_gate_in_place(state, U, target_index, N):
     """
