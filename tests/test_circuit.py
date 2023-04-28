@@ -2,9 +2,6 @@ from epyr.circuit import Circuit
 from epyr.operators import *
 from epyr.state import * 
 
-from numpy import array_equal
-
-
 def test_simple_circuit():
     c = Circuit(1)  # 1-qubit circuit
     c.h()  # Add a Hadamard gate

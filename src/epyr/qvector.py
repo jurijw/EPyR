@@ -20,7 +20,8 @@ class QVector:
         try:
             rows, cols = arr.shape
             if not (rows == 1 or cols == 1):
-                raise ValueError("Input array must be of the shape (1,N) or (N,1).")
+                raise ValueError(
+                    "Input array must be of the shape (1,N) or (N,1).")
         except ValueError:
             # Triggered when an ndarray of shape (N,) is passed
             arr = arr.reshape(arr.shape[0], 1)
@@ -35,7 +36,8 @@ class QVector:
         self._ket = ket
         self._arr = arr
 
-    @property  # TODO: Perhaps return a copy of array. -> Probably not good from a performance stand-point.
+    # TODO: Perhaps return a copy of array. -> Probably not good from a performance stand-point.
+    @property
     def arr(self):
         """Return the np.ndarray I represent."""
         return self._arr

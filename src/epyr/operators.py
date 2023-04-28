@@ -1,5 +1,6 @@
 import numpy as np
 
+
 __all__ = ["I", "X", "Y", "Z", "H", "S", "CNOT"]
 
 # Define common quantum logic gates

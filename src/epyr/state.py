@@ -1,7 +1,9 @@
 import numpy as np
 from qvector import QVector
 
-__all__ = ["up", "down", "plus", "minus", "right", "left", "phi_plus", "phi_minus", "psi_plus", "psi_minus", "State"]
+
+__all__ = ["up", "down", "plus", "minus", "right", "left",
+           "phi_plus", "phi_minus", "psi_plus", "psi_minus", "State"]
 
 # Common single qubit states
 up = np.array([1, 0])
@@ -30,6 +32,7 @@ state_dict = dict({
     "psi_minus": psi_minus,
 })
 
+
 class State:
     """A class that captures the state of a quantum system and provides utility functions."""
 
@@ -41,7 +44,7 @@ class State:
         self.state: np.ndarray = np.zeros(2 ** N)
         self.state[0] = 1
         self._N = N
-    
+
     @property
     def N(self):
         return self._N
@@ -74,7 +77,7 @@ class State:
         string = ""
         for i in range(len(state)):
             # The probability amplitude for the ith basis state.
-            ci = state[i] 
+            ci = state[i]
             if ci != 0:
                 string += f"({ci})"
                 string += State.basis_vector_string(N, i)
@@ -84,7 +87,7 @@ class State:
     def show(self):
         """Print the state in braket notation in the computational basis."""
         print(State.ket_string(self.state))
-    
+
     def __eq__(self, state: np.ndarray):
         """The state is considered equal to a given state array if 
         all entries in the state vectors match."""

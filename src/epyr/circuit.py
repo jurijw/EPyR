@@ -1,7 +1,7 @@
 import numpy as np
 from state import State
 from operators import operator_dict
-from epyr_exception import EpyrException 
+from epyr_exception import EpyrException
 
 
 class Circuit:
@@ -13,7 +13,7 @@ class Circuit:
         self._gates = []
         # Unitary transform corresponding to the entire circuit.
         # Note: this is incredibly inefficient.
-        self._U = None  
+        self._U = None
 
     @property
     def N(self):
@@ -36,7 +36,8 @@ class Circuit:
         collapses."""
         basis_indices = np.arange(2 ** self.N)
         probabilities = state.probabilities[:, 0]
-        collapsed_state_index = np.random.choice(basis_indices, p=probabilities)
+        collapsed_state_index = np.random.choice(
+            basis_indices, p=probabilities)
         return collapsed_state_index
 
     @staticmethod
@@ -45,7 +46,8 @@ class Circuit:
         inefficient."""
         U = gates[0]
         for i in range(1, len(gates)):
-            U = gates[i] @ U  # TODO: consider, if numpy has a built-in to do this.
+            # TODO: consider, if numpy has a built-in to do this.
+            U = gates[i] @ U
         return U
 
     ##################################
@@ -61,8 +63,8 @@ class Circuit:
             if gate not in operator_dict.keys():
                 raise EpyrException("The requested gate is not available.")
             gate = operator_dict[gate]
-            
-        # By default, apply the gate to the first log2(m) qubits.  
+
+        # By default, apply the gate to the first log2(m) qubits.
         if indices is None:
             num_affected_qubits = int(np.log2(len(gate)))
             indices = [i for i in range(num_affected_qubits)]
@@ -70,46 +72,46 @@ class Circuit:
             indices = [indices]
         # TODO: check unitarIty and that it functions with the indices
         self._gates.append((gate, indices))
-    
+
     def add_common(self, gate, indices=None):
         """Add one of the common gates, defined in the operators module,
-        to the circuit.""" 
+        to the circuit."""
         self.add(gate, indices)
 
     def i(self, index=0):
-        """Add an identity gate to the qubit at position INDEX."""        
+        """Add an identity gate to the qubit at position INDEX."""
         self.add_common("I", index)
 
     def x(self, index=0):
-        """Add a NOT gate to the qubit at position INDEX."""        
+        """Add a NOT gate to the qubit at position INDEX."""
         self.add_common("X", index)
 
     def y(self, index=0):
-        """Add a Y gate to the qubit at position INDEX."""        
+        """Add a Y gate to the qubit at position INDEX."""
         self.add_common("Y", index)
 
     def z(self, index=0):
-        """Add a Z gate to the qubit at position INDEX."""        
+        """Add a Z gate to the qubit at position INDEX."""
         self.add_common("Z", index)
 
     def h(self, index=0):
-        """Add a Hadamard gate to the qubit at position INDEX."""        
+        """Add a Hadamard gate to the qubit at position INDEX."""
         self.add_common("H", index)
 
     def s(self, index=0):
-        """Add an S gate to the qubit at position INDEX."""        
+        """Add an S gate to the qubit at position INDEX."""
         self.add_common("S", index)
 
     def cnot(self, control, target):
         """Add a CNOT gate from the qubit at position CONTROL
-        to the qubit at position TARGET."""        
+        to the qubit at position TARGET."""
         indices = [control, target]
         self.add_common("H", indices)
-    
+
     def reset(self):
         """Clear all the gates in this circuit."""
-        self._gates = []       
-        
+        self._gates = []
+
     #############################
     ###### STATE EVOLUTION ######
     #############################
@@ -121,13 +123,16 @@ class Circuit:
             num_affected_qubits = np.log2(len(gate))
             if num_affected_qubits == 1:
                 target = indices[0]
-                apply_general_one_qubit_gate_in_place(state.state, gate, target, self.N)
+                apply_general_one_qubit_gate_in_place(
+                    state.state, gate, target, self.N)
             elif num_affected_qubits == 2:
                 target0, target1 = indices
-                apply_general_two_qubit_gate_in_place(state.state, gate, target0, target1, self.N)
+                apply_general_two_qubit_gate_in_place(
+                    state.state, gate, target0, target1, self.N)
             else:
                 raise NotImplemented
-    
+
+
 def apply_general_one_qubit_gate_in_place(state, U, target_index, N):
     """
     Applies a 1-qubit quantum gate U to a state vector. Mutates the state vector 
@@ -166,7 +171,6 @@ def apply_general_one_qubit_gate_in_place(state, U, target_index, N):
             state[j_prime] = alpha_j * u10 + alpha_j_prime * u11
 
 
-    
 def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
     """
     Apply the two-qubit gate U to qubits with index q0 and q1 for
@@ -182,7 +186,7 @@ def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
                 # Create a vector of relevant alpha_js
                 # Below, j(b_q0)(b_q1) represents the index of the
                 # basis state for fixed i0, i1, i2 and with the
-                # bits in position q0 and q1 being b_q0 and b_q1 
+                # bits in position q0 and q1 being b_q0 and b_q1
                 j00 = l + 2 ** q0 * 0 + 2 ** q1 * 0
                 j01 = l + 2 ** q0 * 0 + 2 ** q1 * 1
                 j10 = l + 2 ** q0 * 1 + 2 ** q1 * 0
