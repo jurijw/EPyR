@@ -35,7 +35,7 @@ class Circuit:
         """Perform a complete measurement on the state. Returns the index of the basis state to which the wave-function
         collapses."""
         basis_indices = np.arange(2 ** self.N)
-        probabilities = state.probabilities[:, 0]
+        probabilities = state.probabilities()
         collapsed_state_index = np.random.choice(
             basis_indices, p=probabilities)
         return collapsed_state_index
@@ -120,7 +120,7 @@ class Circuit:
         """Apply the quantum circuit to the given input state."""
         for gate, indices in self._gates:
             # Check how many qubits are affected by the gate
-            num_affected_qubits = np.log2(len(gate))
+            num_affected_qubits = int(np.log2(len(gate)))
             if num_affected_qubits == 1:
                 target = indices[0]
                 apply_general_one_qubit_gate_in_place(

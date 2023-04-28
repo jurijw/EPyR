@@ -8,10 +8,10 @@ __all__ = ["up", "down", "plus", "minus", "right", "left",
 # Common single qubit states
 up = np.array([1, 0])
 down = np.array([0, 1])
-plus = 1/np.sqrt(2) * np.array([1, 1])
-minus = 1/np.sqrt(2) * np.array([1, -1])
-right = 1/np.sqrt(2) * np.array([1, 1j])
-left = 1/np.sqrt(2) * np.array([1, -1j])
+plus = 1 / np.sqrt(2) * np.array([1, 1])
+minus = 1 / np.sqrt(2) * np.array([1, -1])
+right = 1 / np.sqrt(2) * np.array([1, 1j])
+left = 1 / np.sqrt(2) * np.array([1, -1j])
 
 # Bell states
 phi_plus = 1 / np.sqrt(2) * np.array([1, 0, 0, 1])
@@ -36,7 +36,7 @@ state_dict = dict({
 class State:
     """A class that captures the state of a quantum system and provides utility functions."""
 
-    def __init__(self, N: int) -> None:
+    def __init__(self, N: int):
         """Create an N qubit state, which is represented as a (ket) vector with 2^N entries. The vector is taken to be in the
         standard (computational) basis. By default, the state is initialized to the 0th basis state: |0...›.
         The state is represented by a (2^N,) np.ndarray."""
@@ -49,14 +49,9 @@ class State:
     def N(self):
         return self._N
 
-    @staticmethod
-    def probabilities(arr):
-        """Returns an array where the ith entry corresponds to the probability of measuring the state to be the ith basis state."""
-        return np.real(arr.conj() * arr)
-
     def probabilities(self):
         """Returns an array where the ith entry corresponds to the probability of measuring my state to be the ith basis state."""
-        State.probabilities(self.arr)
+        return np.real(self.state.conj() * self.state) 
 
     @staticmethod
     def basis_vector_string(n: int, i: int):
