@@ -1,6 +1,6 @@
 import numpy as np
 
-__all__ = ["I", "X", "Y", "Z", "H", "S", "CNOT", "Operator"]
+__all__ = ["I", "X", "Y", "Z", "H", "S", "CNOT"]
 
 # Define common quantum logic gates
 # Pauli Gates
@@ -16,6 +16,16 @@ S = np.array([[1, 0], [0, 1j]])
 CNOT = np.zeros((4, 4))
 CNOT[0:2, 0:2] = I
 CNOT[2:4, 2:4] = X
+
+operator_dict = dict({
+    "I": I,
+    "X": X,
+    "Y": Y,
+    "Z": Z,
+    "H": H,
+    "S": S,
+    "CNOT": CNOT,
+})
 
 
 class Operator:
