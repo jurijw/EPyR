@@ -1,25 +1,35 @@
 import numpy as np
 from qvector import QVector
 
-__all__ = ["plus", "minus", "right", "left", "State"]
+__all__ = ["up", "down", "plus", "minus", "right", "left", "State"]
 
+# Common single qubit states
+up = np.array([1, 0])
+down = np.array([0, 1])
+plus = 1/np.sqrt(2) * np.array([1, 1])
+minus = 1/np.sqrt(2) * np.array([1, -1])
+right = 1/np.sqrt(2) * np.array([1, 1j])
+left = 1/np.sqrt(2) * np.array([1, -1j])
 
-plus = 1/np.sqrt(2) * np.array([[1, 1]]).T
-minus = 1/np.sqrt(2) * np.array([[1, -1]]).T
-right = 1/np.sqrt(2) * np.array([[1, 1j]]).T
-left = 1/np.sqrt(2) * np.array([[1, -1j]]).T
-
+state_dict = dict({
+    "up": up,
+    "down": down,
+    "plus": plus,
+    "minus": minus,
+    "right": right,
+    "left": left,
+})
 
 class State(QVector):
     """A class that captures the state of a quantum system and provides utility functions."""
 
-    def __init__(self, n: int) -> None:
+    def __init__(self, N: int) -> None:
         """Create an N qubit state, which is represented as a (ket) vector with 2^N entries. The vector is taken to be in the
         standard (computational) basis. By default, the state is initialized to the 0th basis state: |0...›.
         The state is represented by a (2^N, 1) np.ndarray."""
 
-        state: np.ndarray = np.zeros((2 ** n, 1))
-        state[0, :] = 1
+        state: np.ndarray = np.zeros(2 ** N)
+        state[0] = 1
         super().__init__(state)
 
     @staticmethod
