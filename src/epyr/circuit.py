@@ -114,17 +114,17 @@ class Circuit:
     ###### STATE EVOLUTION ######
     #############################
 
-    def compute(self, state):
+    def compute(self, state: State):  # TODO: Consider renaming state.state to state.vec(tor)
         """Apply the quantum circuit to the given input state."""
         for gate, indices in self._gates:
             # Check how many qubits are affected by the gate
             num_affected_qubits = np.log2(len(gate))
             if num_affected_qubits == 1:
                 target = indices[0]
-                apply_general_one_qubit_gate_in_place(state, gate, target, self.N)
+                apply_general_one_qubit_gate_in_place(state.state, gate, target, self.N)
             elif num_affected_qubits == 2:
                 target0, target1 = indices
-                apply_general_two_qubit_gate_in_place(state, gate, target0, target1, self.N)
+                apply_general_two_qubit_gate_in_place(state.state, gate, target0, target1, self.N)
             else:
                 raise NotImplemented
     

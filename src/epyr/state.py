@@ -84,3 +84,16 @@ class State:
     def show(self):
         """Print the state in braket notation in the computational basis."""
         print(State.ket_string(self.state))
+    
+    def __eq__(self, state: np.ndarray):
+        """The state is considered equal to a given state array if 
+        all entries in the state vectors match."""
+        return np.array_equal(self.state, state)
+
+    def __str__(self):
+        """Returns the state vector this state represents."""
+        return str(self.state)
+
+    def __repr__(self):
+        """Returns the state vector this state represents."""
+        return f"State - {self.state}"
