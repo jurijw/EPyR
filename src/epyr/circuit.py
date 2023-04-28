@@ -105,6 +105,10 @@ class Circuit:
         to the qubit at position TARGET."""        
         indices = [control, target]
         self.add_common("H", indices)
+    
+    def reset(self):
+        """Clear all the gates in this circuit."""
+        self._gates = []       
         
     #############################
     ###### STATE EVOLUTION ######
