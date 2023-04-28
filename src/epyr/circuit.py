@@ -48,6 +48,10 @@ class Circuit:
             U = gates[i] @ U  # TODO: consider, if numpy has a built-in to do this.
         return U
 
+    ##################################
+    ###### CIRCUIT CONSTRUCTION ######
+    ##################################
+
     def add(self, gate, indices=None):
         """Add a gate, sequentially to my circuit's gates. The gate passed must be one of the common gates
         defined in the operators module, passed as a string, or an (m x m) unitary. Indices can be a single index or a list of
@@ -56,12 +60,55 @@ class Circuit:
         if type(gate) == str:
             if gate not in operator_dict.keys():
                 raise EpyrException("The requested gate is not available.")
+            gate = operator_dict[gate]
+            
         # By default, apply the gate to the first log2(m) qubits.  
         if indices is None:
-            num_affected_qubits = np.log2(len(gate))
+            num_affected_qubits = int(np.log2(len(gate)))
             indices = [i for i in range(num_affected_qubits)]
+        elif type(indices) == int:
+            indices = [indices]
         # TODO: check unitarIty and that it functions with the indices
         self._gates.append((gate, indices))
+    
+    def add_common(self, gate, indices=None):
+        """Add one of the common gates, defined in the operators module,
+        to the circuit.""" 
+        self.add(gate, indices)
+
+    def i(self, index=0):
+        """Add an identity gate to the qubit at position INDEX."""        
+        self.add_common("I", index)
+
+    def x(self, index=0):
+        """Add a NOT gate to the qubit at position INDEX."""        
+        self.add_common("X", index)
+
+    def y(self, index=0):
+        """Add a Y gate to the qubit at position INDEX."""        
+        self.add_common("Y", index)
+
+    def z(self, index=0):
+        """Add a Z gate to the qubit at position INDEX."""        
+        self.add_common("Z", index)
+
+    def h(self, index=0):
+        """Add a Hadamard gate to the qubit at position INDEX."""        
+        self.add_common("H", index)
+
+    def s(self, index=0):
+        """Add an S gate to the qubit at position INDEX."""        
+        self.add_common("S", index)
+
+    def cnot(self, control, target):
+        """Add a CNOT gate from the qubit at position CONTROL
+        to the qubit at position TARGET."""        
+        indices = [control, target]
+        self.add_common("H", indices)
+        
+    #############################
+    ###### STATE EVOLUTION ######
+    #############################
 
     def compute(self, state):
         """Apply the quantum circuit to the given input state."""
