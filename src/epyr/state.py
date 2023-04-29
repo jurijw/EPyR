@@ -1,5 +1,8 @@
 import numpy as np
-from qvector import QVector
+
+from epyr_exception import EpyrException
+
+from typing import Union
 
 __all__ = ["up", "down", "plus", "minus", "right", "left",
            "phi_plus", "phi_minus", "psi_plus", "psi_minus", "State"]
@@ -52,8 +55,14 @@ class State:
     def N(self):
         return self._N
 
+    def set(self, index):
+        """
+        Set the
+        """
+
     def probabilities(self):
-        """Returns an array where the ith entry corresponds to the probability of measuring my state to be the ith basis state."""
+        """Returns an array where the ith entry corresponds to the probability of measuring my state
+        to be the ith basis state."""
         return np.real(self.state.conj() * self.state)
 
     @staticmethod
@@ -86,13 +95,16 @@ class State:
         """Print the state in braket notation in the computational basis."""
         print(State.ket_string(self.state))
 
-    def __eq__(self, state: np.ndarray):
-        """The state is considered equal to a given state array if 
+    def __eq__(self, state):
+        """The state is considered equal to a given state, or state array, if
         all entries in the state vectors match up to a given tolerance.
         np.allclose is used in favor of np.array_equal to forgive some
         imprecision in floating point calculations."""
-        return np.allclose(self.state, state, rtol=State.EQUALITY_TOLERANCE_RELATIVE,
-                           atol=State.EQUALITY_TOLERANCE_ABSOLUTE, equal_nan=False)
+        if type(state) == np.ndarray:
+            return np.allclose(self.state, state, rtol=State.EQUALITY_TOLERANCE_RELATIVE,
+                               atol=State.EQUALITY_TOLERANCE_ABSOLUTE, equal_nan=False)
+        if isinstance(state, State):
+            return self.state == state.state  # TODO: I hate this notation...
 
     def __str__(self):
         """Returns the state vector this state represents."""
@@ -101,3 +113,26 @@ class State:
     def __repr__(self):
         """Returns the state vector this state represents."""
         return f"State - {self.state}"
+
+    @classmethod
+    def common(cls, state_name):
+        """Create a State instance from a set of common states."""
+        if state_name not in state_dict:
+            raise EpyrException("State with this name is not available.")
+        state_vector = state_dict[state_name]
+        N = int(np.log2(len(state_vector)))
+        state = cls(N)
+        state.state = state_vector
+        return state
+
+    @classmethod
+    def custom(cls, bit_string):
+        """
+        Create the state vector corresponding to the passed bit string.
+        E.g: "000" -> |000>, "010" -> |010>, "1" -> |1>
+        """
+        N = len(bit_string)
+        state_vector = np.zeros(2 ** N)
+        basis_index = int(bit_string, 2)
+        state_vector
+

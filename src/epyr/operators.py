@@ -2,6 +2,10 @@ import numpy as np
 
 __all__ = ["I", "X", "Y", "Z", "H", "S", "CNOT", "SWAP"]
 
+
+# Define inverse sqrt(2) for convenience
+INV2 = 1 / np.sqrt(2)
+
 # Define common quantum logic gates
 # Pauli Gates
 I = np.eye(2)
@@ -10,8 +14,14 @@ Y = np.array([[0, -1j], [1j, 0]])
 Z = np.array([[1, 0], [0, -1]])
 
 # Clifford Gates
-H = 1 / np.sqrt(2) * np.array([[1, 1], [1, -1]])
+H = INV2 * np.array([[1, 1], [1, -1]])
 S = np.array([[1, 0], [0, 1j]])
+
+# T Gate
+T = np.array([
+    [1, 0],
+    [0, np.exp(1j * np.pi / 4)]
+])
 
 # Controlled NOT (CNOT) Gate (2-qubit operator)
 CNOT = np.array([
