@@ -1,7 +1,6 @@
 import numpy as np
 from qvector import QVector
 
-
 __all__ = ["up", "down", "plus", "minus", "right", "left",
            "phi_plus", "phi_minus", "psi_plus", "psi_minus", "State"]
 
@@ -36,12 +35,16 @@ state_dict = dict({
 class State:
     """A class that captures the state of a quantum system and provides utility functions."""
 
+    # Parameters that determine whether two state vectors should be considered equal. See the __eq__() method below.
+    EQUALITY_TOLERANCE_RELATIVE = 1e-05
+    EQUALITY_TOLERANCE_ABSOLUTE = 1e-05
+
     def __init__(self, N: int):
         """Create an N qubit state, which is represented as a (ket) vector with 2^N entries. The vector is taken to be in the
         standard (computational) basis. By default, the state is initialized to the 0th basis state: |0...›.
         The state is represented by a (2^N,) np.ndarray."""
 
-        self.state: np.ndarray = np.zeros(2 ** N)
+        self.state: np.ndarray = np.zeros(2 ** N, dtype=np.complex64)  # NOTE: may want to consider using complex128/256
         self.state[0] = 1
         self._N = N
 
@@ -51,7 +54,7 @@ class State:
 
     def probabilities(self):
         """Returns an array where the ith entry corresponds to the probability of measuring my state to be the ith basis state."""
-        return np.real(self.state.conj() * self.state) 
+        return np.real(self.state.conj() * self.state)
 
     @staticmethod
     def basis_vector_string(n: int, i: int):
@@ -85,8 +88,11 @@ class State:
 
     def __eq__(self, state: np.ndarray):
         """The state is considered equal to a given state array if 
-        all entries in the state vectors match."""
-        return np.array_equal(self.state, state)
+        all entries in the state vectors match up to a given tolerance.
+        np.allclose is used in favor of np.array_equal to forgive some
+        imprecision in floating point calculations."""
+        return np.allclose(self.state, state, rtol=State.EQUALITY_TOLERANCE_RELATIVE,
+                           atol=State.EQUALITY_TOLERANCE_ABSOLUTE, equal_nan=False)
 
     def __str__(self):
         """Returns the state vector this state represents."""

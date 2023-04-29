@@ -120,7 +120,7 @@ class Circuit:
         """Apply the quantum circuit to the given input state."""
         for gate, indices in self._gates:
             # Check how many qubits are affected by the gate
-            num_affected_qubits = int(np.log2(len(gate)))
+            num_affected_qubits = int(np.log2(len(gate)))  # TODO: could be slow, consider computing in add() method.
             if num_affected_qubits == 1:
                 target = indices[0]
                 apply_general_one_qubit_gate_in_place(
@@ -156,8 +156,8 @@ def apply_general_one_qubit_gate_in_place(state, U, target_index, N):
     jump_size = 2 ** (target_index + 1)
     num_jumps = 2 ** (N - (target_index + 1))
 
-    u00, u01 = U[0]
-    u10, u11 = U[1]
+    u00, u10 = U[0]
+    u01, u11 = U[1]
     # Iterate over the basis states. The gate acts on pairs of
     # basis states, whose binary representation differs exactly
     # in the bit with index target_index.
@@ -171,6 +171,39 @@ def apply_general_one_qubit_gate_in_place(state, U, target_index, N):
             state[j_prime] = alpha_j * u10 + alpha_j_prime * u11
 
 
+def apply_general_one_qubit_gate_in_place(state, U, q0, N):
+    """
+    Applies a 1-qubit quantum gate U to a state vector. Mutates the state vector
+    in place to avoid larger matrix multiplications. Algorithm is
+    linear in the number of entries in the state vector, in terms of both time
+    and space.
+
+    Runtime complexity: O(2^N)
+    Space complexity:   O(2^N)
+
+    state:              a vector of length 2^N, where the ith entry gives the
+                        probability amplitude to measure the system in the ith
+                        basis state. (In the computational basis)
+    U:                  a 2x2 unitary matrix, representing the 1-qubit gate.
+    target_index:       the index of the qubit on which the gate is applied.
+                        Indexing from 0.
+    N:                  the number of qubits
+    """
+    for i0 in range(2 ** q0):
+        for i1 in range(2 ** ((N - 1) - q0)):
+                l = i0 + 2 ** (q0 + 1) * i1
+                # Create a vector of relevant alpha_js
+                # Below, j(b_q0)(b_q1) represents the index of the
+                # basis state for fixed i0, i1, i2 and with the
+                # bits in position q0 and q1 being b_q0 and b_q1
+                j0 = l + 2 ** q0 * 0  # If q0 = 0
+                j1 = l + 2 ** q0 * 1
+
+                j = np.array([j0, j1])
+                # Update all alpha_js by applying the U gate
+                state[j] = U @ state[j]
+
+
 def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
     """
     Apply the two-qubit gate U to qubits with index q0 and q1 for
@@ -179,7 +212,8 @@ def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
     """
     assert q0 < q1
     # TODO: if q1 < q0, then transpose U?
-    for i0 in range(2 ** q1):
+    for i0 in range(2 ** q0):
+        # TODO: consider incrementing by the correct amount here rather than doing the multiplication below to get l.
         for i1 in range(2 ** (q1 - q0 - 1)):
             for i2 in range(2 ** ((N - 1) - q1)):
                 l = i0 + 2 ** (q0 + 1) * i1 + 2 ** (q1 + 1) * i2
