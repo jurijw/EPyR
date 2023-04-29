@@ -108,4 +108,45 @@ def test_hadamard_on_entangled_state():
     assert s == expected
 
 
+def test_very_entangled_state():
+    c, s = configure(4)
+    c.h(0)
+    c.cnot(0, 1)
+    c.cnot(0, 2)
+    c.cnot(0, 3)
+    c.compute(s)
+
+    expected = np.zeros(2 ** 4)
+    expected[0], expected[2 ** 4 - 1] = 1, 1
+    expected *= INV2  # 1 / sqrt(2) [|0000> + |1111>]
+    assert s == expected
+
+
+def test_very_very_entangled_state():
+    c, s = configure(10)
+    c.h(0)
+    for i in range(1, 10):
+        c.cnot(0, i)
+
+    c.compute(s)
+
+    expected = np.zeros(2 ** 10)
+    expected[0], expected[2 ** 10 - 1] = 1, 1
+    expected *= INV2  # 1 / sqrt(2) [|00...00> + |11...11>]
+    assert s == expected
+
+
+def test_very_very_entangled_states():
+    for N in range(1, 20):
+        c, s = configure(N)
+        c.h(0)
+        for i in range(1, N):
+            c.cnot(0, i)
+
+        c.compute(s)
+
+        expected = np.zeros(2 ** N)
+        expected[0], expected[2 ** N - 1] = 1, 1
+        expected *= INV2  # 1 / sqrt(2) [|00...00> + |11...11>]
+        assert s == expected
 
