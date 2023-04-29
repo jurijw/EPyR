@@ -79,3 +79,21 @@ def test_bell_state_creation():
     c.cnot(0, 1)
     c.compute(s)
     assert s == phi_plus
+
+
+def test_cnot_skip():
+    expected = INV2 * np.array([1, 0, 0, 0, 0, 1, 0, 0])
+    c, s = configure(3)
+    c.h(0)
+    c.cnot(0, 2)
+    c.compute(s)
+    assert s == expected
+
+
+def test_swapped_cnot():
+    c, s, = configure(2)
+    c.h(1)
+    c.cnot(1, 0)
+    c.compute(s)
+    assert s == phi_plus
+

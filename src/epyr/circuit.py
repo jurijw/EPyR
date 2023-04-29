@@ -1,6 +1,6 @@
 import numpy as np
 from state import State
-from operators import operator_dict
+from operators import operator_dict, swap_two_qubit_gate
 from epyr_exception import EpyrException
 
 
@@ -151,15 +151,12 @@ def apply_general_one_qubit_gate_in_place(state, U, q0, N):
                         Indexing from 0.
     N:                  the number of qubits
     """
-    for i0 in range(2 ** q0):
-        for i1 in range(2 ** ((N - 1) - q0)):
-                l = i0 + 2 ** (q0 + 1) * i1
-                # Create a vector of relevant alpha_js
-                # Below, j(b_q0)(b_q1) represents the index of the
-                # basis state for fixed i0, i1, i2 and with the
-                # bits in position q0 and q1 being b_q0 and b_q1
-                j0 = l + 2 ** q0 * 0  # If q0 = 0
-                j1 = l + 2 ** q0 * 1
+    for i0 in range(1 << q0):
+        for i1 in range(1 << ((N - 1) - q0)):
+                l = i0 + (1 << (q0 + 1)) * i1
+                # Create vector of the indices of the relevant probability amplitudes.
+                j0 = l
+                j1 = l + (1 << q0)
 
                 j = np.array([j0, j1])
                 # Update all alpha_js by applying the U gate
@@ -172,21 +169,24 @@ def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
     an N qubit state. Performs this operation in-place, mutating
     the state vector, to avoid large matrix multiplication.
     """
-    assert q0 < q1
-    # TODO: if q1 < q0, then transpose U?
-    for i0 in range(2 ** q0):
+    # Swap affected qubits if necessary
+    if q0 > q1:
+        U = swap_two_qubit_gate(U)
+        q0, q1 = q1, q0
+
+    for i0 in range(1 << q0):
         # TODO: consider incrementing by the correct amount here rather than doing the multiplication below to get l.
-        for i1 in range(2 ** (q1 - q0 - 1)):
-            for i2 in range(2 ** ((N - 1) - q1)):
-                l = i0 + 2 ** (q0 + 1) * i1 + 2 ** (q1 + 1) * i2
+        for i1 in range(1 << (q1 - q0 - 1)):
+            for i2 in range(1 << ((N - 1) - q1)):
+                l = i0 + (1 << (q0 + 1)) * i1 + (1 << (q1 + 1)) * i2
                 # Create a vector of relevant alpha_js
                 # Below, j(b_q0)(b_q1) represents the index of the
                 # basis state for fixed i0, i1, i2 and with the
                 # bits in position q0 and q1 being b_q0 and b_q1
-                j00 = l + 2 ** q1 * 0 + 2 ** q0 * 0
-                j01 = l + 2 ** q1 * 0 + 2 ** q0 * 1
-                j10 = l + 2 ** q1 * 1 + 2 ** q0 * 0
-                j11 = l + 2 ** q1 * 1 + 2 ** q0 * 1
+                j00 = l
+                j01 = l + (1 << q0)
+                j10 = l + (1 << q1)
+                j11 = l + (1 << q1) + (1 << q0)
 
                 j = np.array([j00, j01, j10, j11])
                 # Update all alpha_js by applying the U gate

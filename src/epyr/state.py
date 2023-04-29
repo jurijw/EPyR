@@ -12,11 +12,11 @@ minus = 1 / np.sqrt(2) * np.array([1, -1])
 right = 1 / np.sqrt(2) * np.array([1, 1j])
 left = 1 / np.sqrt(2) * np.array([1, -1j])
 
-# Bell states
+# Bell states (In the computational basis with the RMB being the LSB)
 phi_plus = 1 / np.sqrt(2) * np.array([1, 0, 0, 1])
 phi_minus = 1 / np.sqrt(2) * np.array([1, 0, 0, -1])
 psi_plus = 1 / np.sqrt(2) * np.array([0, 1, 1, 0])
-psi_minus = 1 / np.sqrt(2) * np.array([0, 1, -1, 0])
+psi_minus = 1 / np.sqrt(2) * np.array([0, -1, 1, 0])  # May cause confusion due to RMB being the LSB (thus 1/-1 swapped)
 
 state_dict = dict({
     "up": up,

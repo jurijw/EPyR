@@ -1,7 +1,6 @@
 import numpy as np
 
-
-__all__ = ["I", "X", "Y", "Z", "H", "S", "CNOT"]
+__all__ = ["I", "X", "Y", "Z", "H", "S", "CNOT", "SWAP"]
 
 # Define common quantum logic gates
 # Pauli Gates
@@ -22,6 +21,13 @@ CNOT = np.array([
     [0, 1, 0, 0]
 ])
 
+SWAP = np.array([
+    [1, 0, 0, 0],
+    [0, 0, 1, 0],
+    [0, 1, 0, 0],
+    [0, 0, 0, 1]
+])
+
 operator_dict = dict({
     "I": I,
     "X": X,
@@ -30,7 +36,17 @@ operator_dict = dict({
     "H": H,
     "S": S,
     "CNOT": CNOT,
+    "SWAP": SWAP,
 })
+
+
+def swap_two_qubit_gate(gate):
+    """Given a unitary 2x2 operator GATE, which operates on |q1 q0>,
+    returns the operator equivalent of acting it on |q0 q1>. This is
+    done by first applying a swap gate, then the operator, and then
+    unswapping (SWAP^dagger = SWAP). TODO: there may be a more efficient way to do this.
+    """
+    return SWAP @ gate @ SWAP
 
 
 class Operator:
