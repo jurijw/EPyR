@@ -106,7 +106,7 @@ class Circuit:
         """Add a CNOT gate from the qubit at position CONTROL
         to the qubit at position TARGET."""
         indices = [control, target]
-        self.add_common("H", indices)
+        self.add_common("CNOT", indices)
 
     def reset(self):
         """Clear all the gates in this circuit."""
@@ -131,44 +131,6 @@ class Circuit:
                     state.state, gate, target0, target1, self.N)
             else:
                 raise NotImplemented
-
-
-def apply_general_one_qubit_gate_in_place(state, U, target_index, N):
-    """
-    Applies a 1-qubit quantum gate U to a state vector. Mutates the state vector 
-    in place, so as to avoid larger matrix multiplications. Algorithm is 
-    linear in the number of entries in the state vector, in terms of both time 
-    and space.
-
-    Runtime complexity: O(2^N) 
-    Space complexity:   O(2^N) 
-
-    state:              a vector of length 2^N, where the ith entry gives the
-                        probability amplitude to measure the system in the ith 
-                        basis state. (In the computational basis)
-    U:                  a 2x2 unitary matrix, representing the 1-qubit gate.
-    target_index:       the index of the qubit on which the gate is applied.
-                        Indexing from 0.
-    N:                  the number of qubits
-    """
-    # TODO: consider checking if U is diagonal.
-    pair_index_delta = 2 ** target_index
-    jump_size = 2 ** (target_index + 1)
-    num_jumps = 2 ** (N - (target_index + 1))
-
-    u00, u10 = U[0]
-    u01, u11 = U[1]
-    # Iterate over the basis states. The gate acts on pairs of
-    # basis states, whose binary representation differs exactly
-    # in the bit with index target_index.
-    for m in range(num_jumps):
-        for n in range(pair_index_delta):
-            j = m * jump_size + n
-            j_prime = j + pair_index_delta
-            alpha_j = state[j]
-            alpha_j_prime = state[j_prime]
-            state[j] = alpha_j * u00 + alpha_j_prime * u01
-            state[j_prime] = alpha_j * u10 + alpha_j_prime * u11
 
 
 def apply_general_one_qubit_gate_in_place(state, U, q0, N):
@@ -221,10 +183,10 @@ def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
                 # Below, j(b_q0)(b_q1) represents the index of the
                 # basis state for fixed i0, i1, i2 and with the
                 # bits in position q0 and q1 being b_q0 and b_q1
-                j00 = l + 2 ** q0 * 0 + 2 ** q1 * 0
-                j01 = l + 2 ** q0 * 0 + 2 ** q1 * 1
-                j10 = l + 2 ** q0 * 1 + 2 ** q1 * 0
-                j11 = l + 2 ** q0 * 1 + 2 ** q1 * 1
+                j00 = l + 2 ** q1 * 0 + 2 ** q0 * 0
+                j01 = l + 2 ** q1 * 0 + 2 ** q0 * 1
+                j10 = l + 2 ** q1 * 1 + 2 ** q0 * 0
+                j11 = l + 2 ** q1 * 1 + 2 ** q0 * 1
 
                 j = np.array([j00, j01, j10, j11])
                 # Update all alpha_js by applying the U gate

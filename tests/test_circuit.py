@@ -73,11 +73,9 @@ def test_simple_multiple_single_qubit_gates():
 
 
 def test_bell_state_creation():
-    c = Circuit(2)  # 2-qubit circuit
+    c, s = configure(2)
     c.h(0)  # Add a Hadamard on the first qubit
     # Add a CNOT gate with the first qubit being the control and the second qubit being the target
     c.cnot(0, 1)
-
-    s = State(2)  # |00>
     c.compute(s)
     assert s == phi_plus

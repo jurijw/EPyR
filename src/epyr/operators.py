@@ -13,10 +13,14 @@ Z = np.array([[1, 0], [0, -1]])
 # Clifford Gates
 H = 1 / np.sqrt(2) * np.array([[1, 1], [1, -1]])
 S = np.array([[1, 0], [0, 1j]])
+
 # Controlled NOT (CNOT) Gate (2-qubit operator)
-CNOT = np.zeros((4, 4))
-CNOT[0:2, 0:2] = I
-CNOT[2:4, 2:4] = X
+CNOT = np.array([
+    [1, 0, 0, 0],
+    [0, 0, 0, 1],
+    [0, 0, 1, 0],
+    [0, 1, 0, 0]
+])
 
 operator_dict = dict({
     "I": I,
