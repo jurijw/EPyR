@@ -97,3 +97,15 @@ def test_swapped_cnot():
     c.compute(s)
     assert s == phi_plus
 
+
+def test_hadamard_on_entangled_state():
+    expected = 1 / 2 * np.array([1, 1, 1, -1])
+    # Setup entangled state
+    c = Circuit(2)
+    s = State.common("phi_plus")  # 1 / sqrt(2) [|00> + |11>]
+    c.h(0)
+    c.compute(s)
+    assert s == expected
+
+
+

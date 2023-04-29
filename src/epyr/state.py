@@ -55,11 +55,6 @@ class State:
     def N(self):
         return self._N
 
-    def set(self, index):
-        """
-        Set the
-        """
-
     def probabilities(self):
         """Returns an array where the ith entry corresponds to the probability of measuring my state
         to be the ith basis state."""
@@ -134,5 +129,7 @@ class State:
         N = len(bit_string)
         state_vector = np.zeros(2 ** N)
         basis_index = int(bit_string, 2)
-        state_vector
-
+        state_vector[basis_index] = 1
+        state = cls(N)
+        state.state = state_vector
+        return state
