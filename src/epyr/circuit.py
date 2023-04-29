@@ -1,7 +1,7 @@
 import numpy as np
-from state import State
-from operators import operator_dict, swap_two_qubit_gate
-from epyr_exception import EpyrException
+from .state import State
+from .operators import operator_dict, swap_two_qubit_gate
+from .epyr_exception import EpyrException
 
 
 class Circuit:

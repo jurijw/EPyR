@@ -1,6 +1,6 @@
 import numpy as np
 
-from epyr_exception import EpyrException
+from .epyr_exception import EpyrException
 
 from typing import Union
 

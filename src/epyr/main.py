@@ -3,4 +3,6 @@ def main():
 
 
 if __name__ == "__main__":
+    from .circuit import Circuit
+    c = Circuit(2)
     main()
