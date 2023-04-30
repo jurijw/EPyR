@@ -1,7 +1,10 @@
 import numpy as np
+from numba import jit
 from .state import State
 from .operators import operator_dict, swap_two_qubit_gate
 from .epyr_exception import EpyrException
+
+ENABLE_NUMBA = True
 
 
 class Circuit:
@@ -116,8 +119,9 @@ class Circuit:
     ###### STATE EVOLUTION ######
     #############################
 
-    def compute(self, state: State):  # TODO: Consider renaming state.state to state.vec(tor)
+    def compute(self, state: State, enable_numba=True):  # TODO: Consider renaming state.state to state.vec(tor)
         """Apply the quantum circuit to the given input state."""
+        ENABLE_NUMBA = enable_numba
         for gate, indices in self._gates:
             # Check how many qubits are affected by the gate
             num_affected_qubits = int(np.log2(len(gate)))  # TODO: could be slow, consider computing in add() method.
@@ -133,6 +137,18 @@ class Circuit:
                 raise NotImplemented
 
 
+# @source: https://stackoverflow.com/questions/10724854/how-to-do-a-conditional-decorator-in-python
+def conditional_decorator(dec, condition):
+    def decorator(func):
+        if not condition:
+            # Return the function unchanged, not decorated.
+            return func
+        return dec(func)
+
+    return decorator
+
+
+@conditional_decorator(jit, ENABLE_NUMBA)
 def apply_general_one_qubit_gate_in_place(state, U, q0, N):
     """
     Applies a 1-qubit quantum gate U to a state vector. Mutates the state vector
@@ -153,16 +169,17 @@ def apply_general_one_qubit_gate_in_place(state, U, q0, N):
     """
     for i0 in range(1 << q0):
         for i1 in range(1 << ((N - 1) - q0)):
-                l = i0 + (1 << (q0 + 1)) * i1
-                # Create vector of the indices of the relevant probability amplitudes.
-                j0 = l
-                j1 = l + (1 << q0)
+            l = i0 + (1 << (q0 + 1)) * i1
+            # Create vector of the indices of the relevant probability amplitudes.
+            j0 = l
+            j1 = l + (1 << q0)
 
-                j = np.array([j0, j1])
-                # Update all alpha_js by applying the U gate
-                state[j] = U @ state[j]
+            j = np.array([j0, j1])
+            # Update all alpha_js by applying the U gate
+            state[j] = U @ state[j]
 
 
+@conditional_decorator(jit, ENABLE_NUMBA)
 def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
     """
     Apply the two-qubit gate U to qubits with index q0 and q1 for
