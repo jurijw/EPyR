@@ -14,7 +14,7 @@ Y = np.array([[0, -1j], [1j, 0]])
 Z = np.array([[1, 0], [0, -1]])
 
 # Clifford Gates
-H = INV2 * np.array([[1, 1], [1, -1]])
+H = INV2 * np.array([[1, 1], [1, -1]], dtype=np.complex64)
 S = np.array([[1, 0], [0, 1j]])
 
 # T Gate
@@ -29,7 +29,7 @@ CNOT = np.array([
     [0, 0, 0, 1],
     [0, 0, 1, 0],
     [0, 1, 0, 0]
-])
+], dtype=np.complex64)
 
 SWAP = np.array([
     [1, 0, 0, 0],
@@ -50,7 +50,7 @@ operator_dict = dict({
 })
 
 
-def swap_two_qubit_gate(gate):
+def swap_two_qubit_gate(gate: np.ndarray) -> np.ndarray:
     """Given a unitary 2x2 operator GATE, which operates on |q1 q0>,
     returns the operator equivalent of acting it on |q0 q1>. This is
     done by first applying a swap gate, then the operator, and then
