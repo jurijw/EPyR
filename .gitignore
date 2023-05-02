@@ -136,3 +136,7 @@ dmypy.json
 
 # VS Code filed
 .vscode
+
+# Ignore locally stored data and plots
+Plots/
+Data/
