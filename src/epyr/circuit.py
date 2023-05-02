@@ -1,5 +1,5 @@
 import numpy as np
-from numba import jit
+from numba import njit
 from .state import State
 from .operators import operator_dict, swap_two_qubit_gate
 from .epyr_exception import EpyrException
@@ -148,8 +148,8 @@ def conditional_decorator(dec, condition):
     return decorator
 
 
-@conditional_decorator(jit, ENABLE_NUMBA)
-def apply_general_one_qubit_gate_in_place(state, U, q0, N):
+@conditional_decorator(njit, ENABLE_NUMBA)
+def apply_general_one_qubit_gate_in_place(state, U, target_index, N):
     """
     Applies a 1-qubit quantum gate U to a state vector. Mutates the state vector
     in place to avoid larger matrix multiplications. Algorithm is
@@ -167,19 +167,21 @@ def apply_general_one_qubit_gate_in_place(state, U, q0, N):
                         Indexing from 0.
     N:                  the number of qubits
     """
-    for i0 in range(1 << q0):
-        for i1 in range(1 << ((N - 1) - q0)):
-            l = i0 + (1 << (q0 + 1)) * i1
+    # Enumerate all bit values before the target qubit
+    for i0 in range(2 ** target_index):
+        # Enumerate all bit values after the target qubit
+        for i1 in range(2 ** ((N - 1) - target_index)):
+            offset = i0 + i1 * (2 ** (target_index + 1))
             # Create vector of the indices of the relevant probability amplitudes.
-            j0 = l
-            j1 = l + (1 << q0)
+            c0 = offset
+            c1 = offset + (2 ** target_index)
 
-            j = np.array([j0, j1])
-            # Update all alpha_js by applying the U gate
-            state[j] = U @ state[j]
+            cs = np.array([c0, c1])
+            # Update probability amplitudes.
+            state[cs] = U @ state[cs]
 
 
-@conditional_decorator(jit, ENABLE_NUMBA)
+@conditional_decorator(njit, ENABLE_NUMBA)
 def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
     """
     Apply the two-qubit gate U to qubits with index q0 and q1 for
@@ -187,9 +189,10 @@ def apply_general_two_qubit_gate_in_place(state, U, q0, q1, N):
     the state vector, to avoid large matrix multiplication.
     """
     # Swap affected qubits if necessary
-    if q0 > q1:
-        U = swap_two_qubit_gate(U)
-        q0, q1 = q1, q0
+    assert q0 < q1
+    # if q0 > q1:
+    #     U = swap_two_qubit_gate(U)
+    #     q0, q1 = q1, q0
 
     for i0 in range(1 << q0):
         # TODO: consider incrementing by the correct amount here rather than doing the multiplication below to get l.
